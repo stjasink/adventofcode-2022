@@ -1,7 +1,7 @@
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-class Day1Test {
+class Day01Test {
 
     @Test
     fun part1Test() {

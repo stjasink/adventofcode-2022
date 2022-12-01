@@ -3,7 +3,7 @@ import common.runAndTime
 import common.loadInput
 
 fun main() {
-    val input = loadInput("day-1.txt")
+    val input = loadInput("day-01.txt")
     val solver = Day1()
     runAndTime(solver, input)
 }
