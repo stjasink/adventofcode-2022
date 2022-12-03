@@ -20,13 +20,13 @@ class Day03 : Solver {
     }
 
     override fun part2(input: List<String>): Long {
-        return input.windowed(3, 3).map { group ->
+        return input.windowed(3, 3).sumOf { group ->
             val elf1 = group[0].toCharArray().toSet()
             val elf2 = group[1].toCharArray().toSet()
             val elf3 = group[2].toCharArray().toSet()
             val common = elf1.intersect(elf2).intersect(elf3).first()
             itemPriority(common)
-        }.sum().toLong()
+        }.toLong()
     }
 
     private fun itemPriority(common: Char): Int {
