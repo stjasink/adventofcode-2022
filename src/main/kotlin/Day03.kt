@@ -29,11 +29,9 @@ class Day03 : Solver {
         }.toLong()
     }
 
+    private val charsPoints = ('a'..'z') + ('A'..'Z')
+
     private fun itemPriority(common: Char): Int {
-        return when {
-            (common in 'a'..'z') -> common.code - 'a'.code + 1
-            (common in 'A'..'Z') -> common.code - 'A'.code + 27
-            else -> throw IllegalStateException("Unknown common char $common")
-        }
+        return charsPoints.indexOf(common) + 1
     }
 }
