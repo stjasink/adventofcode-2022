@@ -11,18 +11,22 @@ fun main() {
 class Day04 : Solver {
 
     override fun part1(input: List<String>): Long {
-        return input.map { line ->
-            val (area1, area2) = areasFrom(line)
-            val overlap = area1.intersect(area2)
+        return countLinesThatMatch(input) { area1, area2, overlap ->
             overlap == area2 || overlap == area1
-        }.count { it }.toLong()
+        }
     }
 
     override fun part2(input: List<String>): Long {
+        return countLinesThatMatch(input) { _, _, overlap ->
+            overlap.isNotEmpty()
+        }
+    }
+
+    private fun countLinesThatMatch(input: List<String>, match: (Set<Int>, Set<Int>, Set<Int>) -> Boolean): Long {
         return input.map { line ->
             val (area1, area2) = areasFrom(line)
             val overlap = area1.intersect(area2)
-            overlap.isNotEmpty()
+            match(area1, area2, overlap)
         }.count { it }.toLong()
     }
 
