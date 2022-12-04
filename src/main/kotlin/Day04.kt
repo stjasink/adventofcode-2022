@@ -11,27 +11,19 @@ fun main() {
 class Day04 : Solver {
 
     override fun part1(input: List<String>): Long {
-        var total = 0L
-        input.forEach { line ->
+        return input.map { line ->
             val (area1, area2) = areasFrom(line)
             val overlap = area1.intersect(area2)
-            if (overlap == area2 || overlap == area1) {
-                total += 1
-            }
-        }
-        return total
+            overlap == area2 || overlap == area1
+        }.count { it }.toLong()
     }
 
     override fun part2(input: List<String>): Long {
-        var total = 0L
-        input.forEach { line ->
+        return input.map { line ->
             val (area1, area2) = areasFrom(line)
             val overlap = area1.intersect(area2)
-            if (overlap.isNotEmpty()) {
-                total += 1
-            }
-        }
-        return total
+            overlap.isNotEmpty()
+        }.count { it }.toLong()
     }
 
     private fun areasFrom(line: String): Pair<Set<Int>, Set<Int>> {
