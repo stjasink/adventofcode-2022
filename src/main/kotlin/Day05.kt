@@ -11,46 +11,26 @@ fun main() {
 class Day05 : SolverString {
 
     override fun part1(input: List<String>): String {
-        val numStacks = getNumStacks(input)
-        val stacks = Array(numStacks) { mutableListOf<Char>() }
-        var initialising = true
-        input.forEach { line ->
-            if (line.startsWith(" 1")) {
-                stacks.forEach { stack ->
-                    stack.reverse()
-                }
-                initialising = false
-            }
-            if (initialising) {
-                val parts = line.chunked(4)
-                parts.forEachIndexed { stackNum, part ->
-                    if (part.startsWith("[")) {
-                        stacks[stackNum].add(part[1])
-                    }
-                }
-            } else {
-                if (line.startsWith("move")) {
-                    val regex = Regex("move (\\d*) from (\\d*) to (\\d*)")
-                    val matches = regex.matchEntire(line)!!.groupValues
-                    val numCrates = matches[1].toInt()
-                    val sourceStackNum = matches[2].toInt() - 1
-                    val destStackNum = matches[3].toInt() - 1
-                    for (i in 1..numCrates) {
-                        stacks[destStackNum].add(stacks[sourceStackNum].removeLast())
-                    }
-                }
+        return processCrates(input) { stacks, numCrates, sourceStackNum, destStackNum ->
+            for (i in 1..numCrates) {
+                stacks[destStackNum].add(stacks[sourceStackNum].removeLast())
             }
         }
-        val answer = StringBuilder()
-        stacks.forEach { stack ->
-            if (stack.isNotEmpty()) {
-                answer.append(stack.last())
-            }
-        }
-        return answer.toString()
     }
 
     override fun part2(input: List<String>): String {
+        return processCrates(input) { stacks, numCrates, sourceStackNum, destStackNum ->
+            val movingCrates = mutableListOf<Char>()
+            for (i in 1..numCrates) {
+                movingCrates.add(stacks[sourceStackNum].removeLast())
+            }
+            movingCrates.reversed().forEach { crate ->
+                stacks[destStackNum].add(crate)
+            }
+        }
+    }
+
+    private fun processCrates(input: List<String>, moveCrates: (Array<MutableList<Char>>, Int, Int, Int) -> Unit): String {
         val numStacks = getNumStacks(input)
         val stacks = Array(numStacks) { mutableListOf<Char>() }
         var initialising = true
@@ -75,13 +55,7 @@ class Day05 : SolverString {
                     val numCrates = matches[1].toInt()
                     val sourceStackNum = matches[2].toInt() - 1
                     val destStackNum = matches[3].toInt() - 1
-                    val movingCrates = mutableListOf<Char>()
-                    for (i in 1..numCrates) {
-                        movingCrates.add(stacks[sourceStackNum].removeLast())
-                    }
-                    movingCrates.reversed().forEach { crate ->
-                        stacks[destStackNum].add(crate)
-                    }
+                    moveCrates(stacks, numCrates, sourceStackNum, destStackNum)
                 }
             }
         }
