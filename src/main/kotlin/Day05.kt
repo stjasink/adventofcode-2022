@@ -20,12 +20,9 @@ class Day05 : SolverString {
 
     override fun part2(input: List<String>): String {
         return processCrates(input) { stacks, numCrates, sourceStackNum, destStackNum ->
-            val movingCrates = mutableListOf<Char>()
+            val currentTop = stacks[destStackNum].size
             for (i in 1..numCrates) {
-                movingCrates.add(stacks[sourceStackNum].removeLast())
-            }
-            movingCrates.reversed().forEach { crate ->
-                stacks[destStackNum].add(crate)
+                stacks[destStackNum].add(currentTop, stacks[sourceStackNum].removeLast())
             }
         }
     }
