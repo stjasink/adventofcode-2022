@@ -11,56 +11,28 @@ fun main() {
 class Day07 : Solver {
 
     override fun part1(input: List<String>): Long {
-        val fs = Dir("/", null)
-        var dir = fs
-        val smallDirs = mutableListOf<Dir>()
-
-        input.drop(1).forEach { line ->
-            when {
-                line == "$ ls" -> {
-                    // listing
-                }
-                line.startsWith("$ cd") -> {
-                    val dirName = line.split(" ")[2]
-                    if (dirName == "..") {
-                        dir.calcSize()
-                        if (dir.size!! <= 100000) {
-                            smallDirs.add(dir)
-                        }
-                        dir = dir.parent!!
-                    } else {
-                        dir = dir.dirs.first { it.name == dirName }
-                    }
-                }
-                line.startsWith("dir") -> {
-                    val dirName = line.split(" ")[1]
-                    dir.dirs.add(Dir(dirName, dir))
-                }
-                line[0].isDigit() -> {
-                    val (size, name) = line.split(" ")
-                    dir.files.add(File(name, size.toLong()))
-                }
-            }
-        }
-        while (dir.name != "/") {
-            dir.calcSize()
-            dir = dir.parent!!
-        }
-
-        val total = smallDirs.sumOf { it.size!! }
-
-        return total
+        val dirSizes = getDirSizes(input)
+        return dirSizes.filter { it < 100000L }.sumOf { it }
     }
 
     override fun part2(input: List<String>): Long {
+        val dirSizes = getDirSizes(input)
+        val spaceUsed = dirSizes.max() // assume "/" dir is the max in the list
+        val spaceLeft = 70000000L - spaceUsed
+        val spaceNeeded = 30000000L - spaceLeft
+        return dirSizes.sorted().first { it >= spaceNeeded }
+    }
+
+    private fun getDirSizes(input: List<String>): List<Long> {
         val fs = Dir("/", null)
         var dir = fs
         val dirSizes = mutableListOf<Long>()
 
+        // drop line 1 as don't need to do "$ cd /" as we created the fs dir above
         input.drop(1).forEach { line ->
             when {
                 line == "$ ls" -> {
-                    // listing
+                    // listing - no need to do anything here
                 }
                 line.startsWith("$ cd") -> {
                     val dirName = line.split(" ")[2]
@@ -72,10 +44,12 @@ class Day07 : Solver {
                         dir = dir.dirs.first { it.name == dirName }
                     }
                 }
+
                 line.startsWith("dir") -> {
                     val dirName = line.split(" ")[1]
                     dir.dirs.add(Dir(dirName, dir))
                 }
+
                 line[0].isDigit() -> {
                     val (size, name) = line.split(" ")
                     dir.files.add(File(name, size.toLong()))
@@ -91,14 +65,7 @@ class Day07 : Solver {
             dir = dir.parent!!
         }
 
-        val spaceUsed = fs.size!!
-        val spaceLeft = 70000000L - spaceUsed
-        val spaceNeeded = 30000000L - spaceLeft
-
-        dirSizes.sort()
-        val delSize = dirSizes.first { it >= spaceNeeded }
-
-        return delSize
+        return dirSizes
     }
 
     class Dir(
