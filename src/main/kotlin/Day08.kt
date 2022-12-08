@@ -13,28 +13,16 @@ class Day08 : Solver {
     override fun part1(input: List<String>): Long {
         val trees = input.map { row-> row.map { it.digitToInt() } }
         return trees.mapIndexed { rowNum, row ->
-            row.mapIndexed { colNum, _ ->
-                if (colNum == 0 || rowNum == 0) {
-                    true
-                } else if (colNum == row.size - 1 || rowNum == trees[0].size - 1) {
+            row.mapIndexed { colNum, tree ->
+                if (colNum == 0 || rowNum == 0 || colNum == row.size - 1 || rowNum == trees[0].size - 1) {
                     true
                 } else {
-                    val thisCol = trees.map { row -> row[colNum] }
-                    val leftTrees = trees[rowNum].subList(0, colNum)
-                    val rightTrees = trees[rowNum].subList(colNum+1, trees[rowNum].size)
-                    val topTrees = thisCol.subList(0, rowNum)
-                    val bottomTrees = thisCol.subList(rowNum+1, thisCol.size)
-                    if (trees[rowNum][colNum] > leftTrees.max()) {
-                        true
-                    } else if (trees[rowNum][colNum] > rightTrees.max()) {
-                        true
-                    } else if (trees[rowNum][colNum] > topTrees.max()) {
-                        true
-                    } else if (trees[rowNum][colNum] > bottomTrees.max()) {
-                        true
-                    } else {
-                        false
-                    }
+                    val col = trees.map { row -> row[colNum] }
+                    val leftTreesMax = row.subList(0, colNum).max()
+                    val rightTreesMax = row.subList(colNum+1, trees[rowNum].size).max()
+                    val topTreesMax = col.subList(0, rowNum).max()
+                    val bottomTreesMax = col.subList(rowNum+1, col.size).max()
+                    tree > leftTreesMax || tree > rightTreesMax || tree > topTreesMax || tree > bottomTreesMax
                 }
             }.count { it }
         }.sum().toLong()
@@ -44,11 +32,11 @@ class Day08 : Solver {
         val trees = input.map { row-> row.map { it.digitToInt() } }
         return trees.mapIndexed { rowNum, row ->
             row.mapIndexed { colNum, tree ->
-                val thisCol = trees.map { row -> row[colNum] }
-                val leftScore = trees[rowNum].subList(0, colNum).reversed().findScore(tree)
-                val rightScore = trees[rowNum].subList(colNum+1, trees[rowNum].size).findScore(tree)
-                val topScore = thisCol.subList(0, rowNum).reversed().findScore(tree)
-                val bottomScore = thisCol.subList(rowNum+1, thisCol.size).findScore(tree)
+                val col = trees.map { row -> row[colNum] }
+                val leftScore = row.subList(0, colNum).reversed().findScore(tree)
+                val rightScore = row.subList(colNum+1, trees[rowNum].size).findScore(tree)
+                val topScore = col.subList(0, rowNum).reversed().findScore(tree)
+                val bottomScore = col.subList(rowNum+1, col.size).findScore(tree)
                 leftScore * rightScore * topScore * bottomScore
             }.max()
         }.max()
