@@ -22,36 +22,36 @@ class Day09 : Solver {
         val knotsAt = Array(numKnots) {Point(0, 0)}.toMutableList()
         val tailVisited = mutableSetOf<Point>()
 
-        fun adjustYDiag(headNum: Int, tailNum: Int) {
-            if (knotsAt[headNum].y - knotsAt[tailNum].y > 0) {
-                knotsAt[tailNum] = knotsAt[tailNum].copy(y = knotsAt[tailNum].y + 1)
-            } else if (knotsAt[headNum].y - knotsAt[tailNum].y < 0) {
-                knotsAt[tailNum] = knotsAt[tailNum].copy(y = knotsAt[tailNum].y - 1)
+        fun adjustYDiag(num: Int) {
+            if (knotsAt[num].y - knotsAt[num+1].y > 0) {
+                knotsAt[num+1] = knotsAt[num+1].incY()
+            } else if (knotsAt[num].y - knotsAt[num+1].y < 0) {
+                knotsAt[num+1] = knotsAt[num+1].decY()
             }
         }
 
-        fun adjustXDiag(headNum: Int, tailNum: Int) {
-            if (knotsAt[headNum].x - knotsAt[tailNum].x > 0) {
-                knotsAt[tailNum] = knotsAt[tailNum].copy(x = knotsAt[tailNum].x + 1)
-            } else if (knotsAt[headNum].x - knotsAt[tailNum].x < 0) {
-                knotsAt[tailNum] = knotsAt[tailNum].copy(x = knotsAt[tailNum].x - 1)
+        fun adjustXDiag(num: Int) {
+            if (knotsAt[num].x - knotsAt[num+1].x > 0) {
+                knotsAt[num+1] = knotsAt[num+1].incX()
+            } else if (knotsAt[num].x - knotsAt[num+1].x < 0) {
+                knotsAt[num+1] = knotsAt[num+1].decX()
             }
         }
 
-        fun moveKnot(headNum: Int, tailNum: Int) {
-            if (knotsAt[headNum].x - knotsAt[tailNum].x > 1) {
-                knotsAt[tailNum] = knotsAt[tailNum].copy(x = knotsAt[tailNum].x + 1)
-                adjustYDiag(headNum, tailNum)
-            } else if (knotsAt[headNum].x - knotsAt[tailNum].x < -1) {
-                knotsAt[tailNum] = knotsAt[tailNum].copy(x = knotsAt[tailNum].x - 1)
-                adjustYDiag(headNum, tailNum)
+        fun moveNextKnot(num: Int) {
+            if (knotsAt[num].x - knotsAt[num+1].x > 1) {
+                knotsAt[num+1] = knotsAt[num+1].incX()
+                adjustYDiag(num)
+            } else if (knotsAt[num].x - knotsAt[num+1].x < -1) {
+                knotsAt[num+1] = knotsAt[num+1].decX()
+                adjustYDiag(num)
             }
-            if (knotsAt[headNum].y - knotsAt[tailNum].y > 1) {
-                knotsAt[tailNum] = knotsAt[tailNum].copy(y = knotsAt[tailNum].y + 1)
-                adjustXDiag(headNum, tailNum)
-            } else if (knotsAt[headNum].y - knotsAt[tailNum].y < -1) {
-                knotsAt[tailNum] = knotsAt[tailNum].copy(y = knotsAt[tailNum].y - 1)
-                adjustXDiag(headNum, tailNum)
+            if (knotsAt[num].y - knotsAt[num+1].y > 1) {
+                knotsAt[num+1] = knotsAt[num+1].incY()
+                adjustXDiag(num)
+            } else if (knotsAt[num].y - knotsAt[num+1].y < -1) {
+                knotsAt[num+1] = knotsAt[num+1].decY()
+                adjustXDiag(num)
             }
         }
 
@@ -62,20 +62,20 @@ class Day09 : Solver {
             for (step in 1..amount) {
                 when (dir) {
                     "R" -> {
-                        knotsAt[0] = knotsAt[0].copy(x = knotsAt[0].x + 1)
+                        knotsAt[0] = knotsAt[0].incX()
                     }
                     "L" -> {
-                        knotsAt[0] = knotsAt[0].copy(x = knotsAt[0].x - 1)
+                        knotsAt[0] = knotsAt[0].decX()
                     }
                     "U" -> {
-                        knotsAt[0] = knotsAt[0].copy(y = knotsAt[0].y + 1)
+                        knotsAt[0] = knotsAt[0].incY()
                     }
                     "D" -> {
-                        knotsAt[0] = knotsAt[0].copy(y = knotsAt[0].y - 1)
+                        knotsAt[0] = knotsAt[0].decY()
                     }
                 }
                 for (knotNum in 0..numKnots-2) {
-                    moveKnot(knotNum, knotNum + 1)
+                    moveNextKnot(knotNum)
                 }
                 tailVisited.add(knotsAt.last())
             }
@@ -88,5 +88,10 @@ class Day09 : Solver {
     data class Point(
         val x: Int,
         val y: Int
-    )
+    ) {
+        fun incX() = this.copy(x = x + 1)
+        fun decX() = this.copy(x = x - 1)
+        fun incY() = this.copy(y = y + 1)
+        fun decY() = this.copy(y = y - 1)
+    }
 }
