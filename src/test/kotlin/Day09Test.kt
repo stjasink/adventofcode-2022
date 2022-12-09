@@ -23,14 +23,14 @@ class Day09Test {
     @Test
     fun part2Test1() {
         val input = """
-                        R 4
-                        U 4
-                        L 3
-                        D 1
-                        R 4
-                        D 1
-                        L 5
-                        R 2
+            R 4
+            U 4
+            L 3
+            D 1
+            R 4
+            D 1
+            L 5
+            R 2
         """.trimIndent().split('\n')
 
         val answer = Day09().part2(input)

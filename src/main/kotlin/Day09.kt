@@ -1,6 +1,8 @@
 import common.Solver
 import common.runAndTime
 import common.loadInput
+import kotlin.math.absoluteValue
+import kotlin.math.sign
 
 fun main() {
     val input = loadInput("day-09.txt")
@@ -23,34 +25,27 @@ class Day09 : Solver {
         val tailVisited = mutableSetOf<Point>()
 
         fun adjustYDiag(num: Int) {
-            if (knotsAt[num].y - knotsAt[num+1].y > 0) {
-                knotsAt[num+1] = knotsAt[num+1].incY()
-            } else if (knotsAt[num].y - knotsAt[num+1].y < 0) {
-                knotsAt[num+1] = knotsAt[num+1].decY()
+            val yDiff = knotsAt[num].y - knotsAt[num+1].y
+            if (yDiff.absoluteValue > 0) {
+                knotsAt[num+1] = knotsAt[num+1].moveY(yDiff.sign)
             }
         }
 
         fun adjustXDiag(num: Int) {
-            if (knotsAt[num].x - knotsAt[num+1].x > 0) {
-                knotsAt[num+1] = knotsAt[num+1].incX()
-            } else if (knotsAt[num].x - knotsAt[num+1].x < 0) {
-                knotsAt[num+1] = knotsAt[num+1].decX()
+            val xDiff = knotsAt[num].x - knotsAt[num+1].x
+            if (xDiff.absoluteValue > 0) {
+                knotsAt[num+1] = knotsAt[num+1].moveX(xDiff.sign)
             }
         }
 
         fun moveNextKnot(num: Int) {
-            if (knotsAt[num].x - knotsAt[num+1].x > 1) {
-                knotsAt[num+1] = knotsAt[num+1].incX()
+            val xDiff = knotsAt[num].x - knotsAt[num+1].x
+            val yDiff = knotsAt[num].y - knotsAt[num+1].y
+            if (xDiff.absoluteValue > 1) {
+                knotsAt[num+1] = knotsAt[num+1].moveX(xDiff.sign)
                 adjustYDiag(num)
-            } else if (knotsAt[num].x - knotsAt[num+1].x < -1) {
-                knotsAt[num+1] = knotsAt[num+1].decX()
-                adjustYDiag(num)
-            }
-            if (knotsAt[num].y - knotsAt[num+1].y > 1) {
-                knotsAt[num+1] = knotsAt[num+1].incY()
-                adjustXDiag(num)
-            } else if (knotsAt[num].y - knotsAt[num+1].y < -1) {
-                knotsAt[num+1] = knotsAt[num+1].decY()
+            } else if (yDiff.absoluteValue > 1) {
+                knotsAt[num+1] = knotsAt[num+1].moveY(yDiff.sign)
                 adjustXDiag(num)
             }
         }
@@ -62,16 +57,16 @@ class Day09 : Solver {
             for (step in 1..amount) {
                 when (dir) {
                     "R" -> {
-                        knotsAt[0] = knotsAt[0].incX()
+                        knotsAt[0] = knotsAt[0].moveX(1)
                     }
                     "L" -> {
-                        knotsAt[0] = knotsAt[0].decX()
+                        knotsAt[0] = knotsAt[0].moveX(-1)
                     }
                     "U" -> {
-                        knotsAt[0] = knotsAt[0].incY()
+                        knotsAt[0] = knotsAt[0].moveY(1)
                     }
                     "D" -> {
-                        knotsAt[0] = knotsAt[0].decY()
+                        knotsAt[0] = knotsAt[0].moveY(-1)
                     }
                 }
                 for (knotNum in 0..numKnots-2) {
@@ -89,9 +84,7 @@ class Day09 : Solver {
         val x: Int,
         val y: Int
     ) {
-        fun incX() = this.copy(x = x + 1)
-        fun decX() = this.copy(x = x - 1)
-        fun incY() = this.copy(y = y + 1)
-        fun decY() = this.copy(y = y - 1)
+        fun moveX(amt: Int) = this.copy(x = x + amt)
+        fun moveY(amt: Int) = this.copy(y = y + amt)
     }
 }
