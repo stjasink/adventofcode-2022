@@ -11,15 +11,14 @@ fun main() {
 class Day13 : Solver {
 
     override fun part1(input: List<String>): Long {
-        var total = 0L
-
-        input.chunked(3).forEachIndexed { index, pair ->
+        return input.chunked(3).mapIndexed { index, pair ->
             val compare = compareStringLists(pair[0], pair[1])
             if (compare == -1) {
-                total += (index + 1)
+                index + 1L
+            } else {
+                0L
             }
-        }
-        return total
+        }.sum()
     }
 
     override fun part2(input: List<String>): Long {
