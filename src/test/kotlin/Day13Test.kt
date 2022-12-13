@@ -75,6 +75,6 @@ class Day13Test {
         """.trimIndent().split('\n')
 
         val answer = Day13().part2(input)
-        assertEquals(0L, answer)
+        assertEquals(140L, answer)
     }
 }
