@@ -31,7 +31,7 @@ class Day13 : Solver {
     }
 
     companion object {
-        fun parseList(input: String): List<ValueOrList> {
+        private fun parseList(input: String): List<ValueOrList> {
             if (input[0] != '[') {
                 throw IllegalStateException("String $input does not start with [")
             }
@@ -54,9 +54,6 @@ class Day13 : Solver {
                         }
                     }
                     c == '[' -> {
-                        if (currVal != null) {
-                            println("currval was not null at [ !!")
-                        }
                         lists.add(mutableListOf())
                     }
                     c == ']' -> {
@@ -86,7 +83,7 @@ class Day13 : Solver {
             return compareLists(left, right)
         }
 
-        fun compareLists(left: List<ValueOrList>, right: List<ValueOrList>): Int {
+        private fun compareLists(left: List<ValueOrList>, right: List<ValueOrList>): Int {
             if (left.isEmpty() && right.isEmpty()) {
                 return 0
             }
