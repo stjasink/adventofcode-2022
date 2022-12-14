@@ -78,7 +78,6 @@ class Day14 : Solver {
         private fun addRockLine(from: Point, to: Point) {
             if (from.y == to.y) {
                 // if horizontal
-                // to is lower x
                 for (x in minOf(from.x, to.x) .. maxOf(from.x, to.x)) {
                     rock.add(Point(x, from.y))
                 }
@@ -86,11 +85,9 @@ class Day14 : Solver {
                 maxRockX = maxOf(maxRockX, maxOf(from.x, to.x))
             } else {
                 // if vertical
-                // to is higher y
                 for (y in minOf(from.y, to.y) .. maxOf(from.y, to.y)) {
                     rock.add(Point(from.x, y))
                 }
-                // remember max y
                 maxRockY = maxOf(maxRockY, maxOf(from.y, to.y))
             }
         }
@@ -108,25 +105,20 @@ class Day14 : Solver {
 
         private fun dropSand(): Boolean {
             var sandAt = Point(500, 0)
-
             if (sand.contains(sandAt)) {
+                // cave is full
                 return false
             }
-
             for (y in 1..maxRockY) {
-                val sandDown = Point(sandAt.x, y)
-                val sandDownLeft = Point(sandAt.x - 1, y)
-                val sandDownRight = Point(sandAt.x + 1, y)
-                if (isOpen(sandDown)) {
-                    sandAt = sandDown
-                } else if (isOpen(sandDownLeft)) {
-                    sandAt = sandDownLeft
-                } else if (isOpen(sandDownRight)) {
-                    sandAt = sandDownRight
-                } else {
+                val destinations = listOf(Point(sandAt.x, y), Point(sandAt.x - 1, y), Point(sandAt.x + 1, y))
+                val validDestination = destinations.firstOrNull { isOpen(it) }
+                if (validDestination == null) {
                     // nowhere for sand to go
                     sand.add(sandAt)
                     return true
+                } else {
+                    // move sand
+                    sandAt = validDestination
                 }
             }
 
