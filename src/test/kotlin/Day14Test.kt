@@ -17,9 +17,11 @@ class Day14Test {
     @Test
     fun part2Test() {
         val input = """
+            498,4 -> 498,6 -> 496,6
+            503,4 -> 502,4 -> 502,9 -> 494,9
         """.trimIndent().split('\n')
 
         val answer = Day14().part2(input)
-        assertEquals(0L, answer)
+        assertEquals(93L, answer)
     }
 }

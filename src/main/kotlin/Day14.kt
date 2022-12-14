@@ -11,23 +11,13 @@ fun main() {
 class Day14 : Solver {
 
     override fun part1(input: List<String>): Long {
-        val cave = Grid(input)
-        cave.print()
-        var numSand = 0L
-        for (i in 0..1_000_000) {
-            val sandLanded = cave.dropSand()
-            if (sandLanded) {
-//                cave.print()
-                numSand += 1
-            } else {
-                return numSand
-            }
-        }
-        throw IllegalStateException("Got to the end")
+        val cave = Grid(input, false)
+        return cave.fillWithSand()
     }
 
     override fun part2(input: List<String>): Long {
-        return 0L
+        val cave = Grid(input, true)
+        return cave.fillWithSand()
     }
 
     data class Point(
@@ -42,20 +32,38 @@ class Day14 : Solver {
         }
     }
 
-    class Grid(input: List<String>) {
-        val rock: MutableSet<Point> = mutableSetOf()
-        val sand: MutableSet<Point> = mutableSetOf()
-        var maxRockY = 0
-        var minRockX = Int.MAX_VALUE
-        var maxRockX = 0
+    class Grid(input: List<String>, withFloor: Boolean) {
+        private val rock: MutableSet<Point> = mutableSetOf()
+        private val sand: MutableSet<Point> = mutableSetOf()
+        private var maxRockY = 0
+        private var minRockX = Int.MAX_VALUE
+        private var maxRockX = 0
 
         init {
             input.forEach {
                 addRockLines(it)
             }
+            if (withFloor) {
+                addFloor()
+            }
         }
 
-        fun addRockLines(lines: String) {
+        fun fillWithSand(): Long {
+//            print()
+            var numSand = 0L
+            for (i in 0..1_000_000) {
+                val sandLanded = dropSand()
+                if (sandLanded) {
+//                    print()
+                    numSand += 1
+                } else {
+                    return numSand
+                }
+            }
+            throw IllegalStateException("Got to the end")
+        }
+
+        private fun addRockLines(lines: String) {
             lines.split("->")
                 .map {it.trim()}
                 .windowed(2)
@@ -67,7 +75,7 @@ class Day14 : Solver {
                 }
         }
 
-        fun addRockLine(from: Point, to: Point) {
+        private fun addRockLine(from: Point, to: Point) {
             if (from.y == to.y) {
                 // if horizontal
                 // to is lower x
@@ -85,11 +93,25 @@ class Day14 : Solver {
                 // remember max y
                 maxRockY = maxOf(maxRockY, maxOf(from.y, to.y))
             }
-
         }
 
-        fun dropSand(): Boolean {
+        private fun addFloor() {
+            val floorY = maxRockY + 2
+            maxRockY = floorY
+            val floorLen = 2 * floorY + 1
+            val floorMinX = 500 - (floorLen/2) - 1
+            val floorMaxX = 500 + (floorLen/2) + 1
+            val floorStart = Point(floorMinX, floorY)
+            val floorEnd = Point(floorMaxX, floorY)
+            addRockLine(floorStart, floorEnd)
+        }
+
+        private fun dropSand(): Boolean {
             var sandAt = Point(500, 0)
+
+            if (sand.contains(sandAt)) {
+                return false
+            }
 
             for (y in 1..maxRockY) {
                 val sandDown = Point(sandAt.x, y)
@@ -108,14 +130,15 @@ class Day14 : Solver {
                 }
             }
 
+            // sand fell into the void
             return false
         }
 
-        fun isOpen(point: Point): Boolean {
+        private fun isOpen(point: Point): Boolean {
             return !(rock.contains(point) || sand.contains(point))
         }
 
-        fun print() {
+        private fun print() {
             for (y in 0..maxRockY) {
                 print("$y ")
                 for (x in minRockX..maxRockX) {
