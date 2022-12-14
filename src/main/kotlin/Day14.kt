@@ -66,10 +66,7 @@ class Day14 : Solver {
                 .map {it.trim()}
                 .windowed(2)
                 .forEach {
-                    val first = Point.from(it[0])
-                    val second = Point.from(it[1])
-                    // first is always higher X and lower Y
-                    addRockLine(first, second)
+                    addRockLine(Point.from(it[0]), Point.from(it[1]))
                 }
         }
 
