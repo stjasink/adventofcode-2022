@@ -51,16 +51,14 @@ class Day14 : Solver {
         fun fillWithSand(): Long {
 //            print()
             var numSand = 0L
-            for (i in 0..1_000_000) {
+            do {
                 val sandLanded = dropSand()
                 if (sandLanded) {
 //                    print()
                     numSand += 1
-                } else {
-                    return numSand
                 }
-            }
-            throw IllegalStateException("Got to the end")
+            } while (sandLanded)
+            return numSand
         }
 
         private fun addRockLines(lines: String) {
