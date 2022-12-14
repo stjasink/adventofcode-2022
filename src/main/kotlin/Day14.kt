@@ -113,11 +113,11 @@ class Day14 : Solver {
                 val destinations = listOf(Point(sandAt.x, y), Point(sandAt.x - 1, y), Point(sandAt.x + 1, y))
                 val validDestination = destinations.firstOrNull { isOpen(it) }
                 if (validDestination == null) {
-                    // nowhere for sand to go
+                    // nowhere for sand to go so it lands here
                     sand.add(sandAt)
                     return true
                 } else {
-                    // move sand
+                    // move sand go next space
                     sandAt = validDestination
                 }
             }
