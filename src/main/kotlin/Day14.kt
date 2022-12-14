@@ -58,6 +58,7 @@ class Day14 : Solver {
                     numSand += 1
                 }
             } while (sandLanded)
+            print()
             return numSand
         }
 
@@ -127,7 +128,6 @@ class Day14 : Solver {
 
         private fun print() {
             for (y in 0..maxRockY) {
-                print("$y ")
                 for (x in minRockX..maxRockX) {
                     val point = Point(x, y)
                     if (rock.contains(point)) {
