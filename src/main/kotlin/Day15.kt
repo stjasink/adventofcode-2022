@@ -65,7 +65,6 @@ class Day15 : Solver {
 
         fun findGap(maxCoord: Long): Point {
             for (rowNum in 0..maxCoord) {
-                println("Row $rowNum")
                 val rangesCovered = mutableListOf<LongRange>()
                 sensorsAndBeacons.forEach { (sensor, beacon) ->
                     val distance = sensor.distanceTo(beacon)
