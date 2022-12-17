@@ -43,23 +43,33 @@ class Day16 : Solver {
     private fun findRoutes(valves: Map<String, Valve>): List<List<Valve>> {
         val completedRoutes = mutableListOf<List<Valve>>()
         val currentRoute = mutableListOf<Valve>()
+        val currentlyOpen = mutableSetOf<String>()
 
         fun takeTurn(atValve: Valve) {
             currentRoute.add(atValve)
             if (currentRoute.size == 31) {
-                // time is up, so route is complete
-                // it's 31 total because we started with AA on time 0
+                // time is up, so route is complete - it's size 31 because we started with AA on time 0
                 completedRoutes.add(currentRoute)
                 currentRoute.removeLast()
+                if (atValve.firstOpen) {
+                    currentlyOpen.remove(atValve.name)
+                }
             } else {
                 // options are to open valve if not already open, or take exit
-                if (!atValve.open) {
+                // don't bother opening if flow is 0
+                if (!atValve.open && atValve.flow != 0) {
                     // open the valve
-                    takeTurn(atValve.open())
+                    currentlyOpen.add(atValve.name)
+                    takeTurn(atValve.firstOpen())
                 } else {
                     // take each exit in turn
                     atValve.exits.forEach { exit ->
-                        takeTurn(valves[exit]!!)
+                        val next = if (currentlyOpen.contains(exit)) {
+                            valves[exit]!!.open()
+                        } else {
+                            valves[exit]!!
+                        }
+                        takeTurn(next)
                     }
                     currentRoute.removeLast()
                 }
@@ -81,6 +91,9 @@ class Day16 : Solver {
             val valve = Valve(name, flow, exits)
             valves[name] = valve
         }
+        valves.forEach { (name, valve) ->
+            println("$name -> $valve")
+        }
         return valves
     }
 
@@ -88,8 +101,10 @@ class Day16 : Solver {
         val name: String,
         val flow: Int,
         val exits: List<String>,
-        val open: Boolean = false
+        val open: Boolean = false,
+        val firstOpen: Boolean = false
     ) {
         fun open() = copy(open = true)
+        fun firstOpen() = copy(open = true, firstOpen = true)
     }
 }
