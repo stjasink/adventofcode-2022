@@ -13,71 +13,37 @@ class Day16 : Solver {
     override fun part1(input: List<String>): Long {
         val valves = parseInput(input)
         val routes = findRoutes(valves)
-//        val testRoute = listOf(valves["AA"]!!, valves["DD"]!!, valves["DD"]!!.open(), valves["CC"]!!, valves["BB"]!!, valves["BB"]!!.open(), valves["AA"]!!, valves["II"]!!, valves["JJ"]!!, valves["JJ"]!!.open(), valves["II"]!!, valves["AA"]!!, valves["DD"]!!.open(), valves["EE"]!!, valves["FF"]!!, valves["GG"]!!, valves["HH"]!!, valves["HH"]!!.open(), valves["GG"]!!, valves["FF"]!!, valves["EE"]!!, valves["EE"]!!.open(), valves["DD"]!!, valves["CC"]!!, valves["CC"]!!.open(), valves["CC"]!!, valves["CC"]!!, valves["CC"]!!, valves["CC"]!!, valves["CC"]!!.open(), valves["CC"]!!)
-//        val routes = listOf(testRoute)
-        val routeFlows = routes.map { flowForRoute(it) }
-        return routeFlows.max()
+        return routes.toLong()
     }
 
     override fun part2(input: List<String>): Long {
         return 0L
     }
 
-    private fun flowForRoute(route: List<Valve>): Long {
-        val seenOpenValves = mutableSetOf<String>()
-        val flowAndTimes = route.mapIndexed { time, valve ->
-            val flowTime = if (valve.open && !seenOpenValves.contains(valve.name)) {
-                seenOpenValves.add(valve.name)
-                30 - time
-            } else {
-                0
+    private fun findRoutes(valves: Map<String, Valve>): Int {
+        fun takeTurn(atValveName: String, seenValves: Set<String>, openValves: Set<String>, timeLeft: Int): Int {
+            if (timeLeft <= 0) {
+                return 0
             }
-            valve.flow to flowTime
-        }
-        val totalFlow = flowAndTimes.map { (flow, time) ->
-            flow * time
-        }.sum()
-        return totalFlow.toLong()
-    }
-
-    private fun findRoutes(valves: Map<String, Valve>): List<List<Valve>> {
-        val completedRoutes = mutableListOf<List<Valve>>()
-        val currentRoute = mutableListOf<Valve>()
-        val currentlyOpen = mutableSetOf<String>()
-
-        fun takeTurn(atValve: Valve) {
-            currentRoute.add(atValve)
-            if (currentRoute.size == 31) {
-                // time is up, so route is complete - it's size 31 because we started with AA on time 0
-                completedRoutes.add(currentRoute)
-                currentRoute.removeLast()
-                if (atValve.firstOpen) {
-                    currentlyOpen.remove(atValve.name)
-                }
-            } else {
-                // options are to open valve if not already open, or take exit
-                // don't bother opening if flow is 0
-                if (!atValve.open && atValve.flow != 0) {
-                    // open the valve
-                    currentlyOpen.add(atValve.name)
-                    takeTurn(atValve.firstOpen())
-                } else {
-                    // take each exit in turn
-                    atValve.exits.forEach { exit ->
-                        val next = if (currentlyOpen.contains(exit)) {
-                            valves[exit]!!.open()
-                        } else {
-                            valves[exit]!!
-                        }
-                        takeTurn(next)
-                    }
-                    currentRoute.removeLast()
+            val scores = mutableListOf<Int>()
+            val atValve = valves[atValveName]!!
+            if (atValve.name !in openValves && atValve.flow > 0) {
+                val remainingFlowThisValve = atValve.flow * (timeLeft - 1)
+                atValve.exits.forEach {
+                    val branchFlow = takeTurn(it, setOf(atValve.name), openValves + atValve.name, timeLeft - 2)
+                    scores.add(remainingFlowThisValve + branchFlow)
                 }
             }
+            atValve.exits.forEach {
+                if (it !in seenValves) {
+                    val branchFlow = takeTurn(it, setOf(atValve.name) + atValve.name, openValves, timeLeft - 1)
+                    scores.add(branchFlow)
+                }
+            }
+            return scores.maxOrNull() ?: 0
         }
 
-        takeTurn(valves["AA"]!!)
-        return completedRoutes
+        return takeTurn("AA", emptySet(), emptySet(), 30)
     }
 
     private fun parseInput(input: List<String>): Map<String, Valve> {
@@ -100,11 +66,6 @@ class Day16 : Solver {
     data class Valve(
         val name: String,
         val flow: Int,
-        val exits: List<String>,
-        val open: Boolean = false,
-        val firstOpen: Boolean = false
-    ) {
-        fun open() = copy(open = true)
-        fun firstOpen() = copy(open = true, firstOpen = true)
-    }
+        val exits: List<String>
+    )
 }
