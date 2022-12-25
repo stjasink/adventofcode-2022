@@ -25,7 +25,7 @@ class Day16 : Solver {
             if (timeLeft <= 0) {
                 return 0
             }
-            val scores = mutableListOf<Int>()
+            val scores = mutableSetOf<Int>()
             val atValve = valves[atValveName]!!
             if (atValve.name !in openValves && atValve.flow > 0) {
                 val remainingFlowThisValve = atValve.flow * (timeLeft - 1)
